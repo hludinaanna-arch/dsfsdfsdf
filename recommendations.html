@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackMyUni - Персональные рекомендации</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { 
+            --primary-color: #5a5ce6; 
+            --primary-hover: #4a4cd6; 
+            --text-dark: #111; 
+            --text-gray: #6b7280; 
+            --bg-light: #f9fafb; 
+            --card-bg: #fff;
+            --success: #10b981;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        
+        /* Header */
+        header { background-color: #fff; padding: 1.5rem 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .header-content { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 0.5rem; }
+        .logo span { color: var(--primary-color); }
+        nav a { margin-left: 1.5rem; font-weight: 500; color: var(--text-dark); }
+        nav a:hover { color: var(--primary-color); }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+        /* Form Section */
+        .survey-section { background: var(--card-bg); padding: 3rem; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+        .survey-title { font-size: 2.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; text-align: left; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--text-gray); }
+        .form-control { width: 100%; padding: 1rem; border: 2px solid #e5e7eb; border-radius: 0.8rem; font-family: inherit; font-size: 1rem; transition: 0.3s; }
+        .form-control:focus { border-color: var(--primary-color); outline: none; }
+        
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 0.5rem; }
+        .checkbox-item { display: flex; align-items: center; gap: 0.5rem; background: #f3f4f6; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        .checkbox-item input { accent-color: var(--primary-color); }
+
+        .btn-submit { 
+            background: var(--primary-color); color: #fff; border: none; padding: 1.2rem 3rem; 
+            border-radius: 50px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1.2rem;
+            margin-top: 2rem; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(90, 92, 230, 0.3); background: var(--primary-hover); }
+
+        /* Results Section (Hidden by default) */
+        .results-section { display: none; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .result-header { font-size: 2rem; margin-bottom: 2rem; text-align: center; }
+        .highlight-text { color: var(--primary-color); font-weight: 700; cursor: pointer; text-decoration: underline; }
+        
+        .section-block { margin-bottom: 3rem; }
+        .section-title { font-size: 1.5rem; margin-bottom: 1.5rem; border-left: 5px solid var(--primary-color); padding-left: 1rem; }
+
+        /* University Cards */
+        .uni-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+        .uni-card { 
+            background: #fff; padding: 1.5rem; border-radius: 1rem; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #e5e7eb;
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .uni-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .uni-name { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-dark); }
+        .uni-city { font-size: 0.9rem; color: var(--text-gray); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .faculty-tag { 
+            display: inline-block; background: #eef2ff; color: var(--primary-color); 
+            padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;
+        }
+        .match-badge {
+            position: absolute; top: 1rem; right: 1rem; background: var(--success); color: #fff;
+            padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+        }
+
+        /* Olympiad & Volunteering Containers */
+        .item-container { display: flex; flex-direction: column; gap: 1rem; }
+        .item-card { 
+            background: #fff; padding: 1.5rem; border-radius: 1rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); border-left: 4px solid var(--primary-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .item-info h4 { font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .item-info p { font-size: 0.9rem; color: var(--text-gray); }
+        .item-btn { 
+            background: transparent; border: 2px solid var(--primary-color); color: var(--primary-color);
+            padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        .item-btn:hover { background: var(--primary-color); color: #fff; }
+
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; gap: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div class="logo"><i class="fa-solid fa-graduation-cap"></i> Track<span>My</span>Uni</div>
+        <nav>
+            <a href="index.html">Главная</a>
+            <a href="universities.html">Вузы</a>
+            <a href="olympiads.html">Олимпиады</a>
+            <a href="calendar.html">Календарь</a>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <!-- Step 1: Survey -->
+    <section class="survey-section" id="surveyForm">
+        <h1 class="survey-title">Построй свой путь в ВУЗ</h1>
+        <p style="color: var(--text-gray);">Заполни анкету, и наш алгоритм подберет идеальные варианты.</p>
+        
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Твой класс</label>
+                <select id="grade" class="form-control">
+                    <option value="9">9 класс (ОГЭ)</option>
+                    <option value="10">10 класс</option>
+                    <option value="11" selected>11 класс (ЕГЭ)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Интересующее направление</label>
+                <select id="interest" class="form-control">
+                    <option value="IT">IT и Программирование</option>
+                    <option value="Econ">Экономика и Управление</option>
+                    <option value="Hum">Гуманитарные науки / Право</option>
+                    <option value="Eng">Инженерия и Физика</option>
+                    <option value="Med">Медицина и Биология</option>
+                </select>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label>Предметы ЕГЭ (выбери 3 основных)</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" value="Математика"> Математика</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Русский"> Русский язык</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Физика"> Физика</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Информатика"> Информатика</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Обществознание"> Обществознание</label>
+                    <label class="checkbox-item"><input type="checkbox" value="История"> История</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Химия"> Химия</label>
+                    <label class="checkbox-item"><input type="checkbox" value="Биология"> Биология</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Сумма баллов пробников (или планируемая)</label>
+                <input type="number" id="totalScore" class="form-control" placeholder="Например: 240">
+            </div>
+            <div class="form-group">
+                <label>Дополнительно</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="hasVolunteer"> Есть волонтерская книжка</label>
+                    <label class="checkbox-item"><input type="checkbox" id="hasOlympiad"> Участвовал в олимпиадах</label>
+                </div>
+            </div>
+        </div>
+        <button class="btn-submit" onclick="generateRecommendations()">Получить рекомендации</button>
+    </section>
+
+    <!-- Step 2: Results -->
+    <section class="results-section" id="results">
+        <div class="result-header">
+            Отлично! С чего тебе начать сейчас?<br>
+            <span style="font-size: 1.2rem; color: var(--text-gray); font-weight: 400;">По твоим данным тебе подходят вот эти университеты:</span>
+        </div>
+
+        <!-- Universities Block -->
+        <div class="section-block">
+            <div class="uni-list" id="uniContainer">
+                <!-- JS will inject cards here -->
+            </div>
+        </div>
+
+        <!-- Olympiads Block -->
+        <div class="section-block">
+            <h3 class="section-title">Также, чтобы повысить баллы, я могу посоветовать вот эти олимпиады:</h3>
+            <div class="item-container" id="olympContainer">
+                <!-- JS will inject items here -->
+            </div>
+            <p style="margin-top: 1.5rem; text-align: center; font-size: 1.1rem;">
+                Проверь по нашему <a href="calendar.html" class="highlight-text">календарю</a>, когда начинается регистрация на олимпиады!
+            </p>
+        </div>
+
+        <!-- Volunteering Block -->
+        <div class="section-block">
+            <h3 class="section-title">Еще Я могу посоветовать волонтерство, многие университеты дают дополнительные баллы при поступлении, если у тебя есть волонтерская книжка!</h3>
+            <div class="item-container" id="volContainer">
+                <!-- JS will inject items here -->
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 3rem;">
+            <button class="btn-submit" style="width: auto; background: #fff; color: var(--text-dark); border: 2px solid #e5e7eb;" onclick="location.reload()">Пройти заново</button>
+        </div>
+    </section>
+</main>
+
+<!-- Подключаем базу данных (предполагается, что файл data.js существует в той же папке) -->
+<script src="data.js"></script>
+
+<script>
+    function generateRecommendations() {
+        // 1. Сбор данных
+        const grade = document.getElementById('grade').value;
+        const interest = document.getElementById('interest').value;
+        const score = parseInt(document.getElementById('totalScore').value) || 0;
+        const hasVolunteer = document.getElementById('hasVolunteer').checked;
+        const hasOlympiad = document.getElementById('hasOlympiad').checked;
+
+        const userSubjects = [];
+        document.querySelectorAll('.checkbox-group input:checked').forEach(cb => {
+            if(cb.value !== 'hasVolunteer' && cb.value !== 'hasOlympiad') userSubjects.push(cb.value);
+        });
+
+        // 2. Логика подбора ВУЗОВ
+        let recommendedUnis = [];
+        
+        // Фильтрация и скоринг
+        universitiesData.forEach(uni => {
+            let matchedPrograms = [];
+            
+            uni.programs.forEach(prog => {
+                // Проверка совпадения предметов
+                const commonSubjects = prog.subjects.filter(s => userSubjects.includes(s));
+                const subjectMatchRatio = commonSubjects.length / prog.subjects.length;
+
+                // Проверка баллов (если баллов хватает или почти хватает)
+                let isRealistic = false;
+                if (score >= prog.minScore) isRealistic = true;
+                else if (score >= prog.minScore - 30) isRealistic = true; // Рискованно, но показываем
+
+                if (subjectMatchRatio > 0.5 && isRealistic) {
+                    matchedPrograms.push({
+                        name: prog.name,
+                        minScore: prog.minScore,
+                        link: `universities.html?id=${uni.id}` // Ссылка на страницу вуза
+                    });
+                }
+            });
+
+            if (matchedPrograms.length > 0) {
+                recommendedUnis.push({ ...uni, programs: matchedPrograms });
+            }
+        });
+
+        // Сортируем вузы: те, где больше подходящих программ и выше шанс поступления
+        recommendedUnis.sort((a, b) => b.programs.length - a.programs.length);
+
+        // 3. Логика подбора ОЛИМПИАД
+        let recommendedOlymps = olympiadsData.filter(olymp => {
+            // Показываем олимпиады, профиль которых совпадает с интересом или предметами
+            return olymp.subjects.some(s => userSubjects.includes(s)) || 
+                   (interest === 'IT' && olymp.subjects.includes('Информатика')) ||
+                   (interest === 'Eng' && olymp.subjects.includes('Физика'));
+        });
+
+        // 4. Логика подбора ВОЛОНТЕРСТВА
+        let recommendedVol = volunteeringData; // Показываем основные, так как они универсальны для доп. баллов
+
+        // 5. Рендеринг (Вывод на экран)
+        renderResults(recommendedUnis, recommendedOlymps, recommendedVol);
+    }
+
+    function renderResults(unis, olymps, vols) {
+        document.getElementById('surveyForm').style.display = 'none';
+        document.getElementById('results').style.display = 'block';
+
+        // Рендер ВУЗОВ
+        const uniContainer = document.getElementById('uniContainer');
+        if (unis.length === 0) {
+            uniContainer.innerHTML = '<p>По вашим предметам пока нет точных совпадений, попробуйте изменить выбор.</p>';
+        } else {
+            uniContainer.innerHTML = unis.slice(0, 6).map(uni => `
+                <div class="uni-card">
+                    <div class="match-badge">Рекомендуем</div>
+                    <div class="uni-name">${uni.name}</div>
+                    <div class="uni-city"><i class="fa-solid fa-location-dot"></i> ${uni.city}</div>
+                    <div style="margin-top: 1rem;">
+                        ${uni.programs.slice(0, 3).map(p => `
+                            <a href="${p.link}" style="display:block; margin-bottom: 0.5rem; color: var(--primary-color); font-weight: 500;">
+                                <i class="fa-solid fa-arrow-right"></i> ${p.name} (от ${p.minScore} баллов)
+                            </a>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Рендер ОЛИМПИАД
+        const olympContainer = document.getElementById('olympContainer');
+        olympContainer.innerHTML = olymps.map(o => `
+            <div class="item-card">
+                <div class="item-info">
+                    <h4>${o.name}</h4>
+                    <p>Профиль: ${o.subjects.join(', ')} | Льгота: ${o.benefit}</p>
+                </div>
+                <a href="olympiads.html" class="item-btn">Подробнее</a>
+            </div>
+        `).join('');
+
+        // Рендер ВОЛОНТЕРСТВА
+        const volContainer = document.getElementById('volContainer');
+        volContainer.innerHTML = vols.map(v => `
+            <div class="item-card" style="border-left-color: var(--success);">
+                <div class="item-info">
+                    <h4>${v.name}</h4>
+                    <p>Направление: ${v.tags.join(', ')} | Баллы в вуз: ${v.benefit}</p>
+                </div>
+                <a href="${v.link}" target="_blank" class="item-btn" style="border-color: var(--success); color: var(--success);">Перейти</a>
+            </div>
+        `).join('');
+    }
+</script>
+
+</body>
+</html>
